@@ -4,19 +4,26 @@ HomeEase is a trusted household services booking platform. Day 1 establishes a R
 
 ## Project structure
 
-- `Frontend/` - React frontend, built with Vite.
-  - `src/components/`, `pages/`, `layouts/` - reusable UI, page views, and page shells.
-  - `src/services/` - Axios API client and API calls.
-  - `src/routes/`, `context/`, `hooks/`, `utils/`, `assets/` - routing, shared state, reusable hooks, helpers, and static assets.
+- `Frontend/` - React frontend, built with Vite and Tailwind CSS.
+  - `src/pages/`
+    - `LandingPage.jsx` - Landing page with hero, service categories, pro callout, and responsive layout.
+    - `ProviderRegister.jsx` - Service Provider registration form with name, phone, skills, experience, and service areas.
+    - `LoginPage.jsx` - Login page supporting Provider & Customer roles with 1-click demo login.
+    - `ProviderDashboard.jsx` - Provider dashboard with job requests, live status toggling, and earnings metrics.
+    - `ProviderProfile.jsx` - Dedicated profile view for editing provider details.
+  - `src/components/`
+    - `Navbar.jsx` - Responsive top navigation with mobile menu and provider shortcuts.
+    - `Footer.jsx` - Dark branding footer.
+    - `ProfileForm.jsx` - Reusable provider profile form with live skill & service area tag chips.
+  - `src/services/api.js` - API service client connecting to the backend with offline/demo fallbacks.
 - `Backend/` - Node.js and Express backend.
-  - `config/db.js` - Mongoose connection setup.
-  - `controllers/`, `routes/` - HTTP request handling and route definitions.
-  - `middleware/` - request middleware (ready for future authentication and validation).
-  - `models/` - Mongoose models (to be added with domain features).
-  - `utils/` - backend helpers.
-  - `uploads/` - local upload staging area; uploaded files are ignored by Git.
-- `Backend/server.js` - Express application setup and server entry point.
-- `Backend/.env.example` - required backend environment variable template.
+  - `config/db.js` - Mongoose connection setup (MongoDB Atlas).
+  - `models/Provider.js` - Mongoose model for service providers.
+  - `controllers/providerController.js` - Provider registration, login, profile updates, and dashboard stats.
+  - `routes/providerRoutes.js` - Provider endpoints mounted at `/api/providers`.
+  - `middleware/` - request middleware.
+  - `server.js` - Express application setup.
+  - `Backend/.env.example` - required backend environment variable template.
 
 ## Run locally
 
