@@ -218,5 +218,99 @@ export const getProviderDashboard = async (id) => {
     }
   }
 }
+// ---------------------------------------------------------------
+// Admin (Day 4)
+// ---------------------------------------------------------------
+const ADMIN_KEY = 'homeease_admin'
 
+export const getStoredAdmin = () => {
+  try {
+    const data = localStorage.getItem(ADMIN_KEY)
+    return data ? JSON.parse(data) : null
+  } catch {
+    return null
+  }
+}
+
+export const setStoredAdmin = (admin) => {
+  try {
+    localStorage.setItem(ADMIN_KEY, JSON.stringify(admin))
+  } catch (err) {
+    console.error('Failed to save admin session:', err)
+  }
+}
+
+export const clearStoredAdmin = () => {
+  try {
+    localStorage.removeItem(ADMIN_KEY)
+  } catch (err) {
+    console.error('Failed to clear admin session:', err)
+  }
+}
+
+// Admin Login
+// Uses POST /api/admin/login when the backend has it. Until then (backend
+// offline / route missing) it falls back to a local demo admin so the UI
+// can be tested. Real admin auth is added with the backend auth module.
+export const loginAdmin = async ({ email, password }) => {
+  try {
+    const response = await api.post('/admin/login', { email, password })
+    if (response.data?.admin) setStoredAdmin(response.data.admin)
+    return response.data
+  } catch (error) {
+    // Backend answered with a real error (wrong password etc.)
+    if (error.response && error.response.status !== 404) {
+      return { success: false, message: error.response.data?.message || 'Login failed.' }
+    }
+
+    const demoEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@homeease.com'
+    const demoPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123'
+
+    if (email.toLowerCase().trim() === demoEmail && password === demoPassword) {
+      const admin = { _id: 'admin-local', name: 'HomeEase Admin', email: demoEmail, role: 'admin' }
+      setStoredAdmin(admin)
+      return { success: true, message: 'Login successful', admin }
+    }
+    return { success: false, message: 'Invalid admin email or password.' }
+  }
+}
+
+// Admin Dashboard data
+// Real counts only (no dummy data). Providers come from the backend, or from
+// locally registered providers while offline. Other modules (users, bookings,
+// complaints) are filled in by later days, so they start at zero.
+export const getAdminDashboard = async () => {
+  try {
+    const response = await api.get('/admin/dashboard')
+    return response.data
+  } catch {
+    const providers = getRegisteredAccounts().map((p) => {
+      const safe = { ...p }
+      delete safe.password
+      return safe
+    })
+    return {
+      success: true,
+      stats: {
+        totalUsers: 0,
+        totalProviders: providers.length,
+        totalBookings: 0,
+        totalComplaints: 0,
+        totalCategories: SERVICE_CATEGORIES.length,
+      },
+      providers,
+      bookings: [],
+      complaints: [],
+      categories: SERVICE_CATEGORIES,
+    }
+  }
+}
+
+export const SERVICE_CATEGORIES = [
+  { name: 'Electrician', icon: '⚡' },
+  { name: 'Plumber', icon: '🔧' },
+  { name: 'Home cleaning', icon: '✦' },
+  { name: 'Carpenter', icon: '⌂' },
+  { name: 'Appliance repair', icon: '◈' },
+]
 export default api
