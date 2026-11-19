@@ -1,21 +1,35 @@
-const mongoose = require('mongoose')
+
+import mongoose from 'mongoose';
 
 const connectDatabase = async () => {
-  const mongoUri = process.env.MONGODB_URI
+    if (!process.env.MONGODB_URI) {
+        throw new Error('MONGODB_URI is missing from .env');
+    }
 
-  if (!mongoUri) {
-    console.warn('MONGODB_URI is not configured. Skipping database connection.')
-    return false
-  }
+    if (
+        process.env.MONGODB_URI.includes('your_mongodb_connection_string') ||
+        process.env.MONGODB_URI.includes('<password>') ||
+        process.env.MONGODB_URI.includes('<username>')
+    ) {
+        throw new Error('MONGODB_URI still contains placeholder credentials');
+    }
 
-  try {
-    await mongoose.connect(mongoUri)
-    console.log(`MongoDB connected: ${mongoose.connection.host}`)
-    return true
-  } catch (error) {
-    console.error(`MongoDB connection failed: ${error.message}`)
-    return false
-  }
-}
+    try {
+        const connection = await mongoose.connect(
+            process.env.MONGODB_URI,
+            {
+                serverSelectionTimeoutMS: 8000,
+                connectTimeoutMS: 8000,
+            }
+        );
 
-module.exports = connectDatabase
+        console.log(
+            `MongoDB Atlas Connected: ${connection.connection.host}`
+        );
+    } catch (error) {
+        console.error('MongoDB Connection Error:', error.message);
+        throw error;
+    }
+};
+
+export default connectDatabase;

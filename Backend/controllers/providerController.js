@@ -1,6 +1,6 @@
-const crypto = require('crypto')
-const mongoose = require('mongoose')
-const Provider = require('../models/Provider')
+import crypto from 'node:crypto'
+import mongoose from 'mongoose'
+import Provider from '../models/Provider.js'
 
 // In-memory fallback cache for newly registered providers when MongoDB is offline
 const memoryProviders = []
@@ -278,7 +278,7 @@ const getDashboardData = async (req, res) => {
   }
 }
 
-module.exports = {
+export {
   registerProvider,
   loginProvider,
   getProfile,

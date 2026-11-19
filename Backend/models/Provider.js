@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 const providerSchema = new mongoose.Schema(
   {
@@ -61,4 +61,6 @@ const providerSchema = new mongoose.Schema(
   { timestamps: true }
 )
 
-module.exports = mongoose.models.Provider || mongoose.model('Provider', providerSchema)
+const Provider = mongoose.models.Provider || mongoose.model('Provider', providerSchema)
+
+export default Provider

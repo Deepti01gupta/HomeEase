@@ -1,11 +1,11 @@
-const express = require('express')
-const {
+import express from 'express'
+import {
   registerProvider,
   loginProvider,
   getProfile,
   updateProfile,
   getDashboardData,
-} = require('../controllers/providerController')
+} from '../controllers/providerController.js'
 
 const router = express.Router()
 
@@ -18,4 +18,4 @@ router.get('/profile/:id', getProfile)
 router.put('/profile/:id', updateProfile)
 router.get('/dashboard/:id', getDashboardData)
 
-module.exports = router
+export default router

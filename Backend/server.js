@@ -1,33 +1,51 @@
-require('dotenv').config()
 
-const cors = require('cors')
-const express = require('express')
-const connectDatabase = require('./config/db')
-const healthRoutes = require('./routes/healthRoutes')
-const providerRoutes = require('./routes/providerRoutes')
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
-const app = express()
-const port = process.env.PORT || 5000
+import connectDatabase from './config/db.js';
+import healthRoutes from './routes/healthRoutes.js';
+import providerRoutes from './routes/providerRoutes.js';
 
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 5000;
+
+// Middlewares
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-}))
-app.use(express.json())
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+}));
 
-app.use('/api/health', healthRoutes)
-app.use('/api/providers', providerRoutes)
+app.use(express.json());
 
+// Routes
+app.use('/api/health', healthRoutes);
+app.use('/api/providers', providerRoutes);
+
+// 404 handler
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: 'Route not found' })
-})
+    res.status(404).json({
+        success: false,
+        message: 'Route not found',
+    });
+});
 
+// Start server after database connection
 const startServer = async () => {
-  await connectDatabase()
-  app.listen(port, () => {
-    console.log(`HomeEase API running on http://localhost:${port}`)
-  })
-}
+    try {
+        await connectDatabase();
+    } catch (error) {
+        console.warn(
+            `MongoDB unavailable. Starting API with in-memory provider fallback: ${error.message}`
+        );
+    }
 
-startServer()
+    app.listen(port, () => {
+        console.log(`HomeEase API running on http://localhost:${port}`);
+    });
+};
 
-module.exports = app
+startServer();
+
+export default app;
