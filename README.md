@@ -44,3 +44,30 @@ HomeEase is a trusted household services booking platform. Day 1 establishes a R
    ```
 
 The frontend runs at `http://localhost:5173`, the API runs at `http://localhost:5000`, and the health endpoint is `http://localhost:5000/api/health`.
+
+## Day 6 Authentication & User Models
+
+HomeEase Day 6 implements complete JWT authentication, Mongoose User and Provider models, and role-based authorization (CUSTOMER, PROVIDER, ADMIN).
+
+### Authentication Endpoints:
+- `POST /api/auth/register` - Register a new CUSTOMER or PROVIDER (creates User, and linked Provider document with PENDING verification status). ADMIN registration is blocked from public endpoint.
+- `POST /api/auth/login` - Authenticate user, verify password with bcrypt, and issue JWT.
+- `GET /api/auth/me` - Retrieve current authenticated user profile (and linked provider details if applicable).
+- `PUT /api/auth/update-profile` - Update allowed profile details (name, phone, address, profileImage).
+- `POST /api/auth/logout` - Stateless logout acknowledgment.
+- Protected role demo endpoints:
+  - `GET /api/auth/customer-only` - Requires CUSTOMER role.
+  - `GET /api/auth/provider-only` - Requires PROVIDER role.
+  - `GET /api/auth/admin-only` - Requires ADMIN role.
+
+Send authenticated requests with `Authorization: Bearer <JWT>`.
+
+### Postman Collection
+The complete test suite collection is located at:
+[HomeEase-Auth.postman_collection.json](file:///d:/vs_code/WEB_DEV_150/project/HomeEase/Postman/HomeEase-Auth.postman_collection.json)
+
+### Running Day 6 Automated Tests
+```bash
+cd Backend
+npm run test:auth
+```

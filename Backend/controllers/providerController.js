@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import mongoose from 'mongoose'
 import Provider from '../models/Provider.js'
+import User from '../models/User.js'
 
 // In-memory fallback cache for newly registered providers when MongoDB is offline
 const memoryProviders = []
@@ -45,24 +46,39 @@ const registerProvider = async (req, res) => {
       : []
 
     if (isDbConnected()) {
-      const existing = await Provider.findOne({ email: email.toLowerCase() })
+      let user = await User.findOne({ email: email.toLowerCase().trim() })
+      if (!user) {
+        user = await User.create({
+          name: name.trim(),
+          email: email.toLowerCase().trim(),
+          phone: phone.trim(),
+          password,
+          role: 'PROVIDER',
+        })
+      }
+
+      const existing = await Provider.findOne({ userId: user._id })
       if (existing) {
         return res.status(400).json({ success: false, message: 'Provider with this email already exists.' })
       }
 
+      const expNumber = Number(experience) || (typeof experience === 'string' ? parseInt(experience, 10) || 0 : 0)
+
       const newProvider = await Provider.create({
+        userId: user._id,
         name: name.trim(),
         email: email.toLowerCase().trim(),
-        password: hashPassword(password),
         phone: phone.trim(),
         skills: normalizedSkills,
-        experience: String(experience).trim(),
+        experience: expNumber,
         serviceAreas: normalizedAreas,
         hourlyRate: Number(hourlyRate) || 0,
         bio: bio || '',
+        description: bio || '',
         status: 'available',
         rating: 5.0,
         completedJobs: 0,
+        verificationStatus: 'PENDING',
       })
 
       return res.status(201).json({
@@ -201,7 +217,7 @@ const updateProfile = async (req, res) => {
       if (bio !== undefined) updateData.bio = bio
       if (status) updateData.status = status
 
-      const updated = await Provider.findByIdAndUpdate(id, updateData, { new: true })
+      const updated = await Provider.findByIdAndUpdate(id, updateData, { returnDocument: 'after' })
       if (updated) {
         return res.status(200).json({
           success: true,

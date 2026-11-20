@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import connectDatabase from './config/db.js';
 import healthRoutes from './routes/healthRoutes.js';
 import providerRoutes from './routes/providerRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -22,6 +23,7 @@ app.use(express.json());
 // Routes
 app.use('/api/health', healthRoutes);
 app.use('/api/providers', providerRoutes);
+app.use('/api/auth', authRoutes);
 
 // 404 handler
 app.use((req, res) => {

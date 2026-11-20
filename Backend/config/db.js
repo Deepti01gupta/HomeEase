@@ -1,5 +1,13 @@
 
+import dns from 'dns';
 import mongoose from 'mongoose';
+
+// Ensure SRV records can be resolved properly across environments (e.g. Windows Node.js DNS)
+try {
+    dns.setServers(['8.8.8.8', '1.1.1.1']);
+} catch {
+    // Fallback gracefully if setServers is restricted
+}
 
 const connectDatabase = async () => {
     if (!process.env.MONGODB_URI) {

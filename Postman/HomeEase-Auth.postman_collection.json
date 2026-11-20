@@ -1,0 +1,207 @@
+{
+  "info": {
+    "name": "HomeEase Authentication (Day 6 Complete Suite)",
+    "description": "Comprehensive Postman collection for Day 6 user authentication, provider profile linkage, and JWT validation.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Register a new customer",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Deepti Gupta\",\n  \"email\": \"deepti@example.com\",\n  \"phone\": \"9876543210\",\n  \"password\": \"Password@123\",\n  \"role\": \"CUSTOMER\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "2. Register a new service provider",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul@example.com\",\n  \"phone\": \"9876543211\",\n  \"password\": \"Password@123\",\n  \"role\": \"PROVIDER\",\n  \"skills\": [\"Electrical repair\", \"Wiring\"],\n  \"experience\": 5,\n  \"serviceAreas\": [\"Mansarovar\", \"Vaishali Nagar\"],\n  \"description\": \"Licensed electrician with 5 years experience\",\n  \"hourlyRate\": 450\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "3. Register with duplicate email (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Deepti Duplicate\",\n  \"email\": \"deepti@example.com\",\n  \"phone\": \"9876543299\",\n  \"password\": \"Password@123\",\n  \"role\": \"CUSTOMER\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "4. Register without required fields (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"email\": \"incomplete@example.com\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "5. Register with invalid email (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Invalid User\",\n  \"email\": \"not-a-valid-email\",\n  \"phone\": \"9876543210\",\n  \"password\": \"Password@123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "6. Register with ADMIN role (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Unauthorized Admin\",\n  \"email\": \"unauthorized-admin@example.com\",\n  \"phone\": \"9876543212\",\n  \"password\": \"Password@123\",\n  \"role\": \"ADMIN\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/register"
+      }
+    },
+    {
+      "name": "7. Login with correct credentials",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"deepti@example.com\",\n  \"password\": \"Password@123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "8. Login with incorrect password (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"deepti@example.com\",\n  \"password\": \"WrongPassword123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "9. Login with unregistered email (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"notfound@example.com\",\n  \"password\": \"Password@123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "10. Login with missing fields (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"deepti@example.com\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "11. Login with inactive account (must fail)",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"inactive-user@example.com\",\n  \"password\": \"Password@123\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/login"
+      }
+    },
+    {
+      "name": "12. Get current profile (Valid Token)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/auth/me"
+      }
+    },
+    {
+      "name": "13. Protected route without token (must fail)",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/auth/me"
+      }
+    },
+    {
+      "name": "14. Protected route with invalid token (must fail)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer invalid.token.payload" }],
+        "url": "{{baseUrl}}/auth/me"
+      }
+    },
+    {
+      "name": "15. Customer-only role route",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/auth/customer-only"
+      }
+    },
+    {
+      "name": "16. Provider-only role route",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/auth/provider-only"
+      }
+    },
+    {
+      "name": "17. Update profile",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Deepti Gupta Updated\",\n  \"phone\": \"9876543210\",\n  \"address\": \"Jaipur, Rajasthan\",\n  \"profileImage\": \"https://example.com/avatar.jpg\"\n}"
+        },
+        "url": "{{baseUrl}}/auth/update-profile"
+      }
+    },
+    {
+      "name": "18. Logout",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": "{{baseUrl}}/auth/logout"
+      }
+    }
+  ]
+}
