@@ -1,10 +1,17 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { loginProvider, getStoredProvider } from '../services/api'
+import {
+  loginProvider,
+  getStoredProvider,
+  loginCustomer,
+  getStoredCustomer,
+  clearCustomerSession,
+} from '../services/api'
 
 export default function LoginPage() {
   const navigate = useNavigate()
   const currentProvider = getStoredProvider()
+  const currentCustomer = getStoredCustomer()
 
   const [role, setRole] = useState('provider') // 'provider' or 'customer'
   const [email, setEmail] = useState('')
@@ -23,12 +30,15 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const res = await loginProvider({ email: email.trim(), password, role })
+      const res = role === 'provider'
+        ? await loginProvider({ email: email.trim(), password, role })
+        : await loginCustomer({ email: email.trim(), password })
+
       if (res.success) {
         if (role === 'provider') {
           navigate('/provider/dashboard')
         } else {
-          navigate('/')
+          navigate('/customer/profile')
         }
       } else {
         setError(res.message || 'Login failed. Please verify credentials.')
@@ -55,6 +65,16 @@ export default function LoginPage() {
         </div>
 
         {/* Notice if already logged in */}
+        {currentCustomer && (
+          <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">
+            <p>Currently signed in as <strong>{currentCustomer.name}</strong></p>
+            <div className="mt-2 flex gap-3">
+              <Link to="/customer/profile" className="font-bold underline">Go to profile</Link>
+              <button type="button" onClick={clearCustomerSession} className="font-bold text-red-700">Clear session</button>
+            </div>
+          </div>
+        )}
+
         {currentProvider && (
           <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800">
             <p>
@@ -168,8 +188,12 @@ export default function LoginPage() {
           <div className="mt-6 border-t border-[#eef2ee] pt-4 text-center">
             <p className="text-xs text-[#55706d]">
               New to HomeEase?{' '}
-              <Link to="/provider/register" className="font-bold text-[#e76f3c] underline">
-                Register as a Provider
+              <Link to="/customer/register" className="font-bold text-[#e76f3c] underline">
+                Create a customer account
+              </Link>
+              <span className="mx-2 text-[#dce6df]">|</span>
+              <Link to="/provider/register" className="font-bold text-[#174c48] underline">
+                Provider
               </Link>
             </p>
           </div>

@@ -8,6 +8,68 @@ const api = axios.create({
   timeout: 5000,
 })
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('homeease_token')
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+const CUSTOMER_KEY = 'homeease_customer'
+
+export const getStoredCustomer = () => {
+  try {
+    const data = localStorage.getItem(CUSTOMER_KEY)
+    return data ? JSON.parse(data) : null
+  } catch {
+    return null
+  }
+}
+
+export const setStoredCustomer = (customer) => {
+  localStorage.setItem(CUSTOMER_KEY, JSON.stringify(customer))
+}
+
+export const clearCustomerSession = () => {
+  localStorage.removeItem(CUSTOMER_KEY)
+  localStorage.removeItem('homeease_token')
+}
+
+// Customer authentication (Day 7)
+export const registerCustomer = async (customerData) => {
+  const response = await api.post('/auth/register', {
+    ...customerData,
+    role: 'CUSTOMER',
+  })
+  return response.data
+}
+
+export const loginCustomer = async ({ email, password }) => {
+  const response = await api.post('/auth/login', { email, password })
+  if (response.data?.token) localStorage.setItem('homeease_token', response.data.token)
+  if (response.data?.user) setStoredCustomer(response.data.user)
+  return response.data
+}
+
+export const getCustomerProfile = async () => {
+  const response = await api.get('/auth/me')
+  if (response.data?.user) setStoredCustomer(response.data.user)
+  return response.data
+}
+
+export const updateCustomerProfile = async (profileData) => {
+  const response = await api.put('/auth/update-profile', profileData)
+  if (response.data?.user) setStoredCustomer(response.data.user)
+  return response.data
+}
+
+export const logoutCustomer = async () => {
+  try {
+    await api.post('/auth/logout')
+  } finally {
+    clearCustomerSession()
+  }
+}
+
 // Local storage session helpers
 export const getStoredProvider = () => {
   try {
